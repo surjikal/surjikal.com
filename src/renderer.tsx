@@ -2,23 +2,53 @@ import { jsxRenderer } from 'hono/jsx-renderer'
 import { Link, ViteClient } from 'vite-ssr-components/hono'
 
 export const renderer = jsxRenderer(({ children }, c) => {
-  const canonical = `${new URL(c.req.url).origin}/`
+  const origin = new URL(c.req.url).origin
+  const canonical = `${origin}/`
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: 'SURJ',
-    alternateName: 'surjikal',
-    url: canonical,
-    sameAs: [
-      'https://open.spotify.com/artist/4V9z8wSoRXmsMKhW4JrOew',
-      'https://www.youtube.com/@surj1kal',
-      'https://soundcloud.com/surjikal',
-      'https://suno.com/@surjikal',
+    '@graph': [
+      {
+        '@type': 'Person',
+        '@id': `${origin}/#person`,
+        name: 'SURJ',
+        alternateName: 'surjikal',
+        url: canonical,
+        description:
+          'SURJ (surjikal) — music artist based in Oakland, California.',
+        sameAs: [
+          'https://open.spotify.com/artist/4V9z8wSoRXmsMKhW4JrOew',
+          'https://www.youtube.com/@surj1kal',
+          'https://soundcloud.com/surjikal',
+          'https://suno.com/@surjikal',
+        ],
+        homeLocation: {
+          '@type': 'Place',
+          name: 'Oakland, California',
+        },
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${origin}/#website`,
+        url: canonical,
+        name: 'surjikal',
+        description: 'SURJIKAL OFFICIAL',
+        publisher: {
+          '@id': `${origin}/#person`,
+        },
+      },
+      {
+        '@type': 'ProfilePage',
+        '@id': `${origin}/#webpage`,
+        url: canonical,
+        name: 'surjikal',
+        isPartOf: {
+          '@id': `${origin}/#website`,
+        },
+        mainEntity: {
+          '@id': `${origin}/#person`,
+        },
+      },
     ],
-    homeLocation: {
-      '@type': 'Place',
-      name: 'Oakland, California',
-    },
   })
 
   return (
@@ -40,6 +70,15 @@ export const renderer = jsxRenderer(({ children }, c) => {
         <meta name="theme-color" content="#ffffff" />
 
         <link rel="canonical" href={canonical} />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link
+          rel="preload"
+          href="/fonts/unbounded-900.woff2"
+          as="font"
+          type="font/woff2"
+          crossorigin=""
+        />
 
         <meta name="geo.region" content="US-CA" />
         <meta name="geo.placename" content="Oakland, California" />
@@ -58,17 +97,6 @@ export const renderer = jsxRenderer(({ children }, c) => {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd }}
-        />
-
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin=""
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&display=swap"
-          rel="stylesheet"
         />
 
         <ViteClient />

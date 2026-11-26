@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Unbounded";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("/fonts/unbounded-900.woff2") format("woff2");
+}
+
 :root {
   --column-width: min(70vw, 1200px);
   --top-padding: 50px;
@@ -176,6 +184,14 @@ body {
 }
 
 @media (max-width: 700px) {
+  @font-face {
+    font-family: "Unbounded";
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url("/fonts/unbounded-900.woff2") format("woff2");
+  }
+
   :root {
     --column-width: 100vw;
     --top-padding: 28px;

@@ -14,6 +14,13 @@
       "sourceType": "github",
       "skillPath": "skills/hono-jsx/SKILL.md",
       "computedHash": "1654a017075171f1c22809bd897bfe2eb698129ec67664511825448c3d897d27"
+    },
+    "seo-geo": {
+      "source": "ReScienceLab/opc-skills",
+      "commit": "e5b4d6f0f60164abe1830c25acc16389b6b6cda4",
+      "sourceType": "github",
+      "skillPath": "skills/seo-geo/SKILL.md",
+      "computedHash": "3a38d9449cb57e24e14de88045865c237e974b2ccb3ef8127fa84582f5a702c8"
     }
   }
 }
