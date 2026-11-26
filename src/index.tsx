@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { Fragment } from 'hono/jsx'
 import { renderer } from './renderer'
 import { MUSIC_LINKS, SITE } from './site'
 
@@ -81,6 +82,48 @@ app.get('/llms.txt', (c) => {
 
 app.use('/', renderer)
 
+function HomePage() {
+  return (
+    <main class="page">
+      <div class="hero">
+        <div class="surj-wrap">
+          <svg
+            class="surj"
+            viewBox="0 0 1000 190"
+            preserveAspectRatio="none"
+            role="img"
+            aria-label={SITE.artist}
+          >
+            <text x="0" y="165" textLength="1000" lengthAdjust="spacingAndGlyphs">
+              {SITE.artist}
+            </text>
+          </svg>
+        </div>
+
+        <nav class="music-links" aria-label="Music and video">
+          {MUSIC_LINKS.map((link, index) => (
+            <Fragment key={link.id}>
+              {index > 0 && <span class="divider" aria-hidden="true" />}
+              <a
+                class={link.id}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={link.title}
+              >
+                <span class="sr-only">{link.ariaLabel}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d={link.svgPath} />
+                </svg>
+              </a>
+            </Fragment>
+          ))}
+        </nav>
+      </div>
+    </main>
+  )
+}
+
 app.get('/', (c) => {
   for (const [header, value] of Object.entries(PUBLIC_CACHE_HEADERS)) {
     c.header(header, value)
@@ -88,47 +131,7 @@ app.get('/', (c) => {
   c.header('x-robots-tag', 'index, follow')
   c.header('referrer-policy', 'strict-origin-when-cross-origin')
 
-  return c.render(
-    <main class="page">
-      <div class="surj-wrap">
-        <svg
-          class="surj"
-          viewBox="0 0 1000 190"
-          preserveAspectRatio="none"
-          role="img"
-          aria-label={SITE.artist}
-        >
-          <text x="0" y="165" textLength="1000" lengthAdjust="spacingAndGlyphs">
-            {SITE.artist}
-          </text>
-        </svg>
-      </div>
-
-      <section class="panel">
-        <div class="identity">
-          <span>{SITE.name}</span>
-        </div>
-
-        <nav class="music-links" aria-label="Music and video">
-          {MUSIC_LINKS.map((link) => (
-            <a
-              key={link.id}
-              class={link.id}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={link.title}
-            >
-              <span class="sr-only">{link.ariaLabel}</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d={link.svgPath} />
-              </svg>
-            </a>
-          ))}
-        </nav>
-      </section>
-    </main>,
-  )
+  return c.render(<HomePage />)
 })
 
 export default app
