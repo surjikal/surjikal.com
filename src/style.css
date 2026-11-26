@@ -1,21 +1,20 @@
 @font-face {
-  font-family: "Unbounded";
+  font-family: Unbounded;
   font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url("/fonts/unbounded-900.woff2") format("woff2");
+  src: url('/fonts/unbounded-900.woff2') format('woff2');
 }
 
 :root {
   --column-width: min(70vw, 1200px);
   --top-padding: 50px;
   --surj-overlap: 3%;
-
   --black: #000;
   --white: #fff;
   --spotify: #1ed760;
-  --youtube: #ff0033;
-  --soundcloud: #ff5500;
+  --youtube: #f03;
+  --soundcloud: #f50;
 }
 
 * {
@@ -32,8 +31,7 @@ body {
 body {
   background: var(--white);
   color: var(--black);
-  font-family:
-    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .page {
@@ -65,7 +63,7 @@ body {
 
 .surj text {
   fill: var(--black);
-  font-family: "Unbounded", sans-serif;
+  font-family: Unbounded, sans-serif;
   font-size: 200px;
   font-weight: 900;
 }
@@ -108,7 +106,7 @@ body {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
@@ -151,7 +149,7 @@ body {
   display: block;
   width: min(100%, 160px);
   height: min(100%, 160px);
-  fill: currentColor;
+  fill: currentcolor;
 }
 
 .music-links .spotify {
@@ -174,7 +172,7 @@ body {
   transform: scale(0.72);
 }
 
-@media (max-width: 700px) {
+@media (width <= 700px) {
   :root {
     --column-width: 100vw;
     --top-padding: 28px;
@@ -204,7 +202,7 @@ body {
   }
 }
 
-@media (max-width: 430px) {
+@media (width <= 430px) {
   .identity {
     font-size: 11px;
   }

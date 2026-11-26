@@ -92,10 +92,7 @@ export const renderer = jsxRenderer(({ children }, c) => {
     <html lang="en">
       <head>
         <DocumentMeta canonical={canonical} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLd }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
         <ViteClient />
         <Link href="/src/style.css" rel="stylesheet" />
       </head>

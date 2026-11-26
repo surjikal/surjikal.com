@@ -32,11 +32,7 @@ app.get('/.well-known/discord', (c) =>
 
 app.get('/robots.txt', (c) => {
   const origin = new URL(c.req.url).origin
-  const rules = AI_USER_AGENTS.flatMap((agent) => [
-    `User-agent: ${agent}`,
-    'Allow: /',
-    '',
-  ])
+  const rules = AI_USER_AGENTS.flatMap((agent) => [`User-agent: ${agent}`, 'Allow: /', ''])
   const body = [...rules, `Sitemap: ${origin}/sitemap.xml`, ''].join('\n')
 
   return c.text(body, 200, {

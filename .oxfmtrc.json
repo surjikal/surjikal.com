@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "semi": false,
+  "ignorePatterns": [
+    "dist",
+    ".wrangler",
+    ".agents",
+    "worker-configuration.d.ts",
+    "package-lock.json"
+  ]
+}

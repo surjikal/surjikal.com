@@ -13,10 +13,5 @@
   "rules": {
     "typescript/prefer-readonly-parameter-types": "off"
   },
-  "ignorePatterns": [
-    "dist",
-    ".wrangler",
-    ".agents",
-    "worker-configuration.d.ts"
-  ]
+  "ignorePatterns": ["dist", ".wrangler", ".agents", "worker-configuration.d.ts"]
 }

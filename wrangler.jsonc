@@ -7,11 +7,11 @@
   "routes": [
     {
       "pattern": "surjikal.com",
-      "custom_domain": true
-    }
+      "custom_domain": true,
+    },
   ],
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
-  "previews": {}
+  "previews": {},
 }
