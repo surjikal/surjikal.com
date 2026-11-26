@@ -20,7 +20,7 @@
 ## Contributing
 
 - Follow the `contributing` skill ([.agents/skills/contributing/SKILL.md](.agents/skills/contributing/SKILL.md)) for:
-  - Branching & deployment workflow
+  - Branching, worktrees, & deployment workflow
   - Commit format (`commitlint` + textemoji requirement)
   - Agent attribution footers for PRs and comments
 
