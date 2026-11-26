@@ -16,16 +16,16 @@
     "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
-    "hono": "^4.13.16"
+    "hono": "4.13.22"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.9",
-    "@cloudflare/vite-plugin": "^1.44.0",
-    "@commitlint/cli": "^21.2.4",
-    "@commitlint/config-conventional": "^21.2.4",
-    "typescript": "^6.0.2",
-    "vite": "^8.1.4",
-    "vite-ssr-components": "^0.8.0",
-    "wrangler": "^4.110.0"
+    "@cloudflare/vite-plugin": "1.70.2",
+    "@commitlint/cli": "21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
+    "typescript": "6.0.3",
+    "vite": "8.3.8",
+    "vite-ssr-components": "0.8.0",
+    "wrangler": "4.168.0"
   }
 }

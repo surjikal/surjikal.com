@@ -1,5 +1,21 @@
 # Repository Guidelines
 
+## General Guidelines
+
+- Always pin exact package versions.
+- Don't patch symptoms, fix the root cause.
+- Code should be self-explanatory:
+  - Write clear, descriptive variable and function names.
+  - Use DRY & clean code principles.
+  - Use `IIFE` to encapsulate logic for variable assignment.
+  - Don't write parrot comments.
+  - Structure code so its intent is obvious.
+  - Comments should be avoided as much as possible.
+- The compiler, build, and linter are your friends — leverage them:
+  - Write types that are designed to catch bugs at compile-time.
+  - Do not trick the compiler by assigning fake dummy values (e.g. empty string).
+- Do not swallow errors unless explicitly directed or confirmed by a human.
+
 ## Branching & Deployment Workflow
 
 - **Never push or trigger builds directly on `main` for unverified changes.**

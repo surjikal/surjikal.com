@@ -1,5 +1,6 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 import { Link, ViteClient } from 'vite-ssr-components/hono'
+import { MUSIC_LINKS, SITE } from './site'
 
 export const renderer = jsxRenderer(({ children }, c) => {
   const origin = new URL(c.req.url).origin
@@ -10,28 +11,22 @@ export const renderer = jsxRenderer(({ children }, c) => {
       {
         '@type': 'Person',
         '@id': `${origin}/#person`,
-        name: 'SURJ',
-        alternateName: 'surjikal',
+        name: SITE.artist,
+        alternateName: SITE.name,
         url: canonical,
-        description:
-          'SURJ (surjikal) — music artist based in Oakland, California.',
-        sameAs: [
-          'https://open.spotify.com/artist/4V9z8wSoRXmsMKhW4JrOew',
-          'https://www.youtube.com/@surj1kal',
-          'https://soundcloud.com/surjikal',
-          'https://suno.com/@surjikal',
-        ],
+        description: `${SITE.artist} (${SITE.name}) — music artist based in ${SITE.location}.`,
+        sameAs: MUSIC_LINKS.map((link) => link.href),
         homeLocation: {
           '@type': 'Place',
-          name: 'Oakland, California',
+          name: SITE.location,
         },
       },
       {
         '@type': 'WebSite',
         '@id': `${origin}/#website`,
         url: canonical,
-        name: 'surjikal',
-        description: 'SURJIKAL OFFICIAL',
+        name: SITE.name,
+        description: SITE.description,
         publisher: {
           '@id': `${origin}/#person`,
         },
@@ -40,7 +35,7 @@ export const renderer = jsxRenderer(({ children }, c) => {
         '@type': 'ProfilePage',
         '@id': `${origin}/#webpage`,
         url: canonical,
-        name: 'surjikal',
+        name: SITE.name,
         isPartOf: {
           '@id': `${origin}/#website`,
         },
@@ -49,7 +44,7 @@ export const renderer = jsxRenderer(({ children }, c) => {
         },
       },
     ],
-  })
+  }).replace(/</g, '\\u003c')
 
   return (
     <html lang="en">
@@ -57,17 +52,17 @@ export const renderer = jsxRenderer(({ children }, c) => {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <title>surjikal</title>
-        <meta name="description" content="SURJIKAL OFFICIAL" />
-        <meta name="author" content="SURJ" />
-        <meta name="creator" content="SURJ" />
+        <title>{SITE.name}</title>
+        <meta name="description" content={SITE.description} />
+        <meta name="author" content={SITE.artist} />
+        <meta name="creator" content={SITE.artist} />
 
         <meta name="robots" content="index, follow, max-image-preview:large" />
         <meta
           name="googlebot"
           content="index, follow, max-image-preview:large"
         />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content={SITE.themeColor} />
 
         <link rel="canonical" href={canonical} />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -77,22 +72,22 @@ export const renderer = jsxRenderer(({ children }, c) => {
           href="/fonts/unbounded-900.woff2"
           as="font"
           type="font/woff2"
-          crossorigin=""
+          crossorigin="anonymous"
         />
 
-        <meta name="geo.region" content="US-CA" />
-        <meta name="geo.placename" content="Oakland, California" />
+        <meta name="geo.region" content={SITE.geoRegion} />
+        <meta name="geo.placename" content={SITE.location} />
 
         <meta property="og:type" content="profile" />
-        <meta property="og:title" content="surjikal" />
-        <meta property="og:description" content="SURJIKAL OFFICIAL" />
+        <meta property="og:title" content={SITE.name} />
+        <meta property="og:description" content={SITE.description} />
         <meta property="og:url" content={canonical} />
-        <meta property="og:site_name" content="SURJ" />
+        <meta property="og:site_name" content={SITE.artist} />
         <meta property="og:locale" content="en_US" />
 
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="surjikal" />
-        <meta name="twitter:description" content="SURJIKAL OFFICIAL" />
+        <meta name="twitter:title" content={SITE.name} />
+        <meta name="twitter:description" content={SITE.description} />
 
         <script
           type="application/ld+json"
