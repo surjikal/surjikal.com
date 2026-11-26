@@ -28,5 +28,5 @@
 - **Framework & Build:** Hono (`hono/jsx` + `hono/jsx-renderer`) with Vite (`@cloudflare/vite-plugin` and `vite-ssr-components`).
 - **Cloudflare Config:** Uses `wrangler.jsonc` (`surj-homepage`). Use `npm run cf-typegen` after changing bindings/config; do not switch to `cloudflare.config.ts` or run `cf dev` / `cf build` / `cf deploy`.
 - **TypeScript:** Strictest configuration in `tsconfig.json`. Run `npm run typecheck`.
-- **Linting & Formatting:** Biome (`biome.json`). Run `npm run lint` (`biome check --error-on-warnings .`) and `npm run lint:fix` before committing.
+- **Linting & Formatting:** Biome (`biome.json`) + type-aware `oxlint` (`.oxlintrc.json` with `oxlint-tsgolint`). Run `npm run lint` and `npm run lint:fix` before committing.
 - **Agent Skills:** Project-local skills live in `.agents/skills/` (`contributing`, `hono`, `hono-jsx`).

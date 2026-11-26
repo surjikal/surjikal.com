@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error",
+    "pedantic": "error"
+  },
+  "rules": {
+    "typescript/prefer-readonly-parameter-types": "off"
+  },
+  "ignorePatterns": [
+    "dist",
+    ".wrangler",
+    ".agents",
+    "worker-configuration.d.ts"
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Web Art Direction"
+  short_description: "Remove generic visual and editorial AI design smells"
+  default_prompt: "Review the design and copy for AI-generated patterns, preserve its identity, and make targeted improvements."
