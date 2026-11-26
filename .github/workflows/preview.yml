@@ -41,14 +41,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Cache build tooling
-        uses: actions/cache@v4
-        with:
-          path: node_modules/.cache
-          key: build-cache-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json', 'vite.config.ts') }}-${{ hashFiles('src/**', 'public/**') }}
-          restore-keys: |
-            build-cache-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json', 'vite.config.ts') }}-
-
       - name: Build
         run: npm run build
 

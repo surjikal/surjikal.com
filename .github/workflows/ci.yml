@@ -36,13 +36,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Cache build tooling
+      - name: Cache TypeScript build info
         uses: actions/cache@v4
         with:
-          path: node_modules/.cache
-          key: build-cache-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json', 'vite.config.ts') }}-${{ hashFiles('src/**', 'public/**') }}
+          path: node_modules/.cache/tsc/tsbuildinfo
+          key: tsc-cache-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-${{ hashFiles('src/**', 'vite.config.ts', 'worker-configuration.d.ts') }}
           restore-keys: |
-            build-cache-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json', 'vite.config.ts') }}-
+            tsc-cache-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-
 
       - name: Commitlint
         if: github.event_name == 'pull_request'
