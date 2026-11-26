@@ -15,6 +15,7 @@
   - Write types that are designed to catch bugs at compile-time.
   - Do not trick the compiler by assigning fake dummy values (e.g. empty string).
 - Do not swallow errors unless explicitly directed or confirmed by a human.
+- Never bypass git hooks (`--no-verify`); if hooks or checks fail because dependencies are missing in a worktree, run `npm ci` first.
 
 ## Contributing
 
