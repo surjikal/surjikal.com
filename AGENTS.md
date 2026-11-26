@@ -30,3 +30,4 @@
 - **TypeScript:** Strictest configuration in `tsconfig.json`. Run `npm run typecheck`.
 - **Linting & Formatting:** `oxlint` (`.oxlintrc.json` with `oxlint-tsgolint`), `oxfmt` (`.oxfmtrc.json`), and `stylelint` (`.stylelintrc.json`). Run `npm run lint` and `npm run lint:fix` before committing.
 - **Agent Skills:** Project-local skills live in `.agents/skills/` (`contributing`, `hono`, `hono-jsx`).
+- **New Worktrees:** Run `npm ci` to install dependencies if `node_modules` is missing before running lint, typecheck, or build commands.
