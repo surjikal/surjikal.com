@@ -22,3 +22,9 @@
 - **Textemoji required:** Every commit subject must include a kaomoji / textemoji from [textemoji.org](https://www.textemoji.org/) (e.g. `(⌐■_■)`, `¯\_(ツ)_/¯`, `(•̀ᴗ•́)و`, `(☞ﾟヮﾟ)☞`, `٩(◕‿◕｡)۶`).
 - **Allowed types:** `feat`, `fix`, `docs`, `chore`, `ci`, `refactor`, `style`, `perf`, `test`, `build`, `revert`.
 - **Example:** `feat: (づ｡◕‿‿◕｡)づ add shiny new thing`
+
+## Agent Attribution Footer
+
+- Always include a footer formatted as `<verb> <harness> / <model>` when writing PRs or comments:
+  - **PRs:** `vibed with <harness> / <model>`
+  - **Comments:** `roasted by <harness> / <model>`
