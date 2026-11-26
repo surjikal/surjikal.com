@@ -3,12 +3,25 @@
 const CELL_SIZE = 16
 const DOT_SIZE = 2
 const SUB_GRID = 4
-const STEP_INTERVAL_MS = 400
+const STATES = 8
+const THRESHOLD = 2
+const WARMUP_STEPS = 28
+const STEP_INTERVAL_MS = 320
 const FRAME_INTERVAL_MS = 40
-const INITIAL_DENSITY = 0.12
-const DOT_COLOR = 'rgba(243, 240, 234, 0.24)'
+const HUE_BUCKETS = 24
+const HUE_DRIFT_SPEED = 0.000018
 
 const BAYER_4X4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => v / 16)
+
+const IRIDESCENT_PALETTE = Array.from({ length: HUE_BUCKETS }, (_, index) => {
+  const hue = Math.round((index / HUE_BUCKETS) * 360)
+  return `hsla(${hue}, 14%, 87%, 0.22)`
+})
+
+const STATE_INTENSITY = Array.from({ length: STATES }, (_, state) => {
+  const wave = 0.5 - 0.5 * Math.cos((state / STATES) * Math.PI * 2)
+  return 0.08 + 0.92 * wave
+})
 
 interface LifeState {
   cols: number
@@ -26,21 +39,34 @@ function createLifeState(width: number, height: number): LifeState {
   const intensity = new Float32Array(total)
 
   for (let i = 0; i < total; i += 1) {
-    const alive = Math.random() < INITIAL_DENSITY ? 1 : 0
-    cells[i] = alive
-    intensity[i] = alive
+    cells[i] = Math.floor(Math.random() * STATES)
   }
 
-  return {
+  const state: LifeState = {
     cols,
     rows,
     cells,
     next: new Uint8Array(total),
     intensity,
   }
+
+  for (let step = 0; step < WARMUP_STEPS; step += 1) {
+    stepCyclic(state)
+  }
+
+  for (let i = 0; i < total; i += 1) {
+    intensity[i] = STATE_INTENSITY[cells[i] ?? 0] ?? 0
+  }
+
+  return state
 }
 
-function countFiringNeighbors(state: LifeState, x: number, y: number): number {
+function countSuccessorNeighbors(
+  state: LifeState,
+  x: number,
+  y: number,
+  successor: number,
+): number {
   const { cols, rows, cells } = state
   let sum = 0
 
@@ -52,8 +78,11 @@ function countFiringNeighbors(state: LifeState, x: number, y: number): number {
         continue
       }
       const nx = (x + dx + cols) % cols
-      if ((cells[rowOffset + nx] ?? 0) === 1) {
+      if ((cells[rowOffset + nx] ?? 0) === successor) {
         sum += 1
+        if (sum >= THRESHOLD) {
+          return sum
+        }
       }
     }
   }
@@ -61,72 +90,29 @@ function countFiringNeighbors(state: LifeState, x: number, y: number): number {
   return sum
 }
 
-function seedCluster(state: LifeState): void {
-  const { cols, rows, cells } = state
-  const cx = Math.floor(Math.random() * cols)
-  const cy = Math.floor(Math.random() * rows)
-
-  for (let dy = -3; dy <= 3; dy += 1) {
-    const ny = (cy + dy + rows) % rows
-    for (let dx = -3; dx <= 3; dx += 1) {
-      if (Math.random() < 0.35) {
-        const nx = (cx + dx + cols) % cols
-        cells[ny * cols + nx] = 1
-      }
-    }
-  }
-}
-
-function nextCellState(current: number, firingNeighbors: number): number {
-  if (current === 1) {
-    return 2
-  }
-  if (current === 2) {
-    return 0
-  }
-  return firingNeighbors === 2 ? 1 : 0
-}
-
-function stepLife(state: LifeState): void {
+function stepCyclic(state: LifeState): void {
   const { cols, rows, cells, next } = state
-  let firingCount = 0
 
   for (let y = 0; y < rows; y += 1) {
     const rowOffset = y * cols
     for (let x = 0; x < cols; x += 1) {
       const idx = rowOffset + x
-      const value = nextCellState(cells[idx] ?? 0, countFiringNeighbors(state, x, y))
-      next[idx] = value
-      if (value === 1) {
-        firingCount += 1
-      }
+      const current = cells[idx] ?? 0
+      const successor = (current + 1) % STATES
+      const neighbors = countSuccessorNeighbors(state, x, y, successor)
+      next[idx] = neighbors >= THRESHOLD ? successor : current
     }
   }
 
   state.cells.set(next)
-
-  if (firingCount < cols * rows * 0.015) {
-    seedCluster(state)
-  }
-}
-
-function targetIntensity(cell: number): number {
-  if (cell === 1) {
-    return 1
-  }
-  if (cell === 2) {
-    return 0.42
-  }
-  return 0
 }
 
 function updateIntensity(state: LifeState): void {
   const { cells, intensity } = state
   for (let i = 0; i < cells.length; i += 1) {
-    const target = targetIntensity(cells[i] ?? 0)
+    const target = STATE_INTENSITY[cells[i] ?? 0] ?? 0
     const current = intensity[i] ?? 0
-    const rate = target > current ? 0.16 : 0.06
-    intensity[i] = current + (target - current) * rate
+    intensity[i] = current + (target - current) * 0.12
   }
 }
 
@@ -150,24 +136,34 @@ function drawCellDither(
   }
 }
 
+function pickPaletteColor(cell: number, x: number, y: number, timePhase: number): string {
+  const phase = (cell / STATES + x * 0.009 + y * 0.007 + timePhase) % 1
+  const normalized = phase < 0 ? phase + 1 : phase
+  const bucket = Math.floor(normalized * HUE_BUCKETS) % HUE_BUCKETS
+  return IRIDESCENT_PALETTE[bucket] ?? 'hsla(0, 14%, 87%, 0.22)'
+}
+
 function drawDitheredLife(
   ctx: CanvasRenderingContext2D,
   state: LifeState,
   width: number,
   height: number,
+  now: number,
 ): void {
   ctx.clearRect(0, 0, width, height)
-  ctx.fillStyle = DOT_COLOR
 
-  const { cols, rows, intensity } = state
+  const { cols, rows, cells, intensity } = state
+  const timePhase = (now * HUE_DRIFT_SPEED) % 1
 
   for (let y = 0; y < rows; y += 1) {
     const rowOffset = y * cols
     const baseY = y * CELL_SIZE
 
     for (let x = 0; x < cols; x += 1) {
-      const value = intensity[rowOffset + x] ?? 0
-      if (value >= 0.04) {
+      const idx = rowOffset + x
+      const value = intensity[idx] ?? 0
+      if (value >= 0.05) {
+        ctx.fillStyle = pickPaletteColor(cells[idx] ?? 0, x, y, timePhase)
         drawCellDither(ctx, x * CELL_SIZE, baseY, value)
       }
     }
@@ -186,12 +182,12 @@ function startAnimationLoop(
     if (!document.hidden) {
       const { state, width, height } = getViewport()
       if (now - lastStep >= STEP_INTERVAL_MS) {
-        stepLife(state)
+        stepCyclic(state)
         lastStep = now
       }
       if (now - lastFrame >= FRAME_INTERVAL_MS) {
         updateIntensity(state)
-        drawDitheredLife(ctx, state, width, height)
+        drawDitheredLife(ctx, state, width, height, now)
         lastFrame = now
       }
     }
@@ -235,7 +231,7 @@ function initBackgroundLife(): void {
     canvas.height = Math.floor(height * dpr)
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     state = createLifeState(width, height)
-    drawDitheredLife(ctx, state, width, height)
+    drawDitheredLife(ctx, state, width, height, performance.now())
   }
 
   resize()
