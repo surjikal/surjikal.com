@@ -1,0 +1,58 @@
+{
+  "worktree-node-modules": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "node ./hooks/session-start.mjs",
+        "timeout": 5
+      }
+    ]
+  },
+  "repo-command-guards": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/pre-tool-run-command.mjs",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "auto-format-and-typegen": {
+    "PostToolUse": [
+      {
+        "matcher": "write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/post-tool-file-edit.mjs",
+            "timeout": 25
+          }
+        ]
+      },
+      {
+        "matcher": "edit_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/post-tool-file-edit.mjs",
+            "timeout": 25
+          }
+        ]
+      }
+    ]
+  },
+  "pre-finish-ci-gate": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node ./hooks/stop-verify.mjs",
+        "timeout": 60
+      }
+    ]
+  }
+}
