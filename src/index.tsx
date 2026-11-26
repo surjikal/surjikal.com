@@ -50,6 +50,93 @@ app.get('/.well-known/discord', (c) =>
   }),
 )
 
+app.get('/robots.txt', (c) => {
+  const origin = new URL(c.req.url).origin
+  const body = [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    'User-agent: Googlebot',
+    'Allow: /',
+    '',
+    'User-agent: Bingbot',
+    'Allow: /',
+    '',
+    'User-agent: OAI-SearchBot',
+    'Allow: /',
+    '',
+    'User-agent: GPTBot',
+    'Allow: /',
+    '',
+    'User-agent: ChatGPT-User',
+    'Allow: /',
+    '',
+    'User-agent: PerplexityBot',
+    'Allow: /',
+    '',
+    'User-agent: ClaudeBot',
+    'Allow: /',
+    '',
+    'User-agent: anthropic-ai',
+    'Allow: /',
+    '',
+    'User-agent: Google-Extended',
+    'Allow: /',
+    '',
+    `Sitemap: ${origin}/sitemap.xml`,
+    '',
+  ].join('\n')
+
+  return c.text(body, 200, {
+    'content-type': 'text/plain; charset=UTF-8',
+    'cache-control': 'public, max-age=0, s-maxage=3600',
+    'x-content-type-options': 'nosniff',
+  })
+})
+
+app.get('/sitemap.xml', (c) => {
+  const origin = new URL(c.req.url).origin
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${origin}/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+`
+
+  return c.body(xml, 200, {
+    'content-type': 'application/xml; charset=UTF-8',
+    'cache-control': 'public, max-age=0, s-maxage=3600',
+    'x-content-type-options': 'nosniff',
+  })
+})
+
+app.get('/llms.txt', (c) => {
+  const origin = new URL(c.req.url).origin
+  const body = [
+    '# SURJ (surjikal)',
+    '',
+    '> Official homepage for SURJ (surjikal), based in Oakland, California.',
+    '',
+    '## Official Links',
+    '',
+    `- Website: ${origin}/`,
+    '- Spotify: https://open.spotify.com/artist/4V9z8wSoRXmsMKhW4JrOew',
+    '- YouTube: https://www.youtube.com/@surj1kal',
+    '- SoundCloud: https://soundcloud.com/surjikal',
+    '- Suno: https://suno.com/@surjikal',
+    '',
+  ].join('\n')
+
+  return c.text(body, 200, {
+    'content-type': 'text/plain; charset=UTF-8',
+    'cache-control': 'public, max-age=0, s-maxage=3600',
+    'x-content-type-options': 'nosniff',
+  })
+})
+
 app.use('/', renderer)
 
 app.get('/', (c) => {
