@@ -29,3 +29,4 @@ description: Use when creating branches, managing worktrees, writing commits, op
 - Always include a footer formatted as `<verb> <harness> / <model>` when writing PRs or comments:
   - **PRs:** `vibed with <harness> / <model>`
   - **Comments:** `roasted by <harness> / <model>`
+- Precede the footer with a horizontal rule (`---`) when there is body content above it.
