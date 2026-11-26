@@ -84,43 +84,46 @@ app.use('/', renderer)
 
 function HomePage() {
   return (
-    <main class="page">
-      <div class="hero">
-        <div class="surj-wrap">
-          <svg
-            class="surj"
-            viewBox="0 0 1000 190"
-            preserveAspectRatio="none"
-            role="img"
-            aria-label={SITE.artist}
-          >
-            <text x="0" y="165" textLength="1000" lengthAdjust="spacingAndGlyphs">
-              {SITE.artist}
-            </text>
-          </svg>
-        </div>
+    <>
+      <canvas class="bg-life" aria-hidden="true" />
+      <main class="page">
+        <div class="hero">
+          <div class="surj-wrap">
+            <svg
+              class="surj"
+              viewBox="0 0 1000 190"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label={SITE.artist}
+            >
+              <text x="0" y="165" textLength="1000" lengthAdjust="spacingAndGlyphs">
+                {SITE.artist}
+              </text>
+            </svg>
+          </div>
 
-        <nav class="music-links" aria-label="Music and video">
-          {MUSIC_LINKS.map((link, index) => (
-            <Fragment key={link.id}>
-              {index > 0 && <span class="divider" aria-hidden="true" />}
-              <a
-                class={link.id}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={link.title}
-              >
-                <span class="sr-only">{link.ariaLabel}</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d={link.svgPath} />
-                </svg>
-              </a>
-            </Fragment>
-          ))}
-        </nav>
-      </div>
-    </main>
+          <nav class="music-links" aria-label="Music and video">
+            {MUSIC_LINKS.map((link, index) => (
+              <Fragment key={link.id}>
+                {index > 0 && <span class="divider" aria-hidden="true" />}
+                <a
+                  class={link.id}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={link.title}
+                >
+                  <span class="sr-only">{link.ariaLabel}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d={link.svgPath} />
+                  </svg>
+                </a>
+              </Fragment>
+            ))}
+          </nav>
+        </div>
+      </main>
+    </>
   )
 }
 
