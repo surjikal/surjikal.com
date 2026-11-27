@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { Fragment } from 'hono/jsx'
 import { renderer } from './renderer'
 import { MUSIC_LINKS, SITE } from './site'
-import { VIZ_MODES } from './viz-modes'
+import { COLOR_SCHEMES, SPEED_PRESETS, VIZ_MODES } from './viz-modes'
 
 const PUBLIC_CACHE_HEADERS = {
   'cache-control': 'public, max-age=0, s-maxage=3600',
@@ -85,11 +85,11 @@ app.use('/', renderer)
 
 function VizToggle() {
   return (
-    <div class="viz-toggle" role="group" aria-label="Background visualization">
+    <div class="viz-toggle" role="group" aria-label="Background visualization controls">
       <button type="button" class="viz-btn" data-viz-dir="-1" aria-label="Previous visualization">
         ‹
       </button>
-      <select class="viz-select" aria-label="Select visualization">
+      <select class="viz-select" data-viz-control="mode" aria-label="Select visualization">
         {VIZ_MODES.map((mode) => (
           <option key={mode.id} value={mode.id}>
             {mode.label}
@@ -99,6 +99,22 @@ function VizToggle() {
       <button type="button" class="viz-btn" data-viz-dir="1" aria-label="Next visualization">
         ›
       </button>
+      <span class="viz-sep" aria-hidden="true" />
+      <select class="viz-select" data-viz-control="color" aria-label="Select color scheme">
+        {COLOR_SCHEMES.map((scheme) => (
+          <option key={scheme.id} value={scheme.id}>
+            {scheme.label}
+          </option>
+        ))}
+      </select>
+      <span class="viz-sep" aria-hidden="true" />
+      <select class="viz-select" data-viz-control="speed" aria-label="Select speed">
+        {SPEED_PRESETS.map((preset) => (
+          <option key={preset.id} value={preset.id}>
+            {preset.label}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }

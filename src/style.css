@@ -223,8 +223,10 @@ select {
   bottom: 16px;
   z-index: 2;
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 2px;
+  max-width: calc(100vw - 32px);
   padding: 4px;
   border: 1px solid rgb(255 255 255 / 14%);
   border-radius: 999px;
@@ -233,6 +235,13 @@ select {
   color: rgb(255 255 255 / 72%);
   font-size: 12px;
   letter-spacing: 0.03em;
+}
+
+.viz-sep {
+  width: 1px;
+  height: 14px;
+  background: rgb(255 255 255 / 14%);
+  margin: 0 2px;
 }
 
 .viz-btn,
