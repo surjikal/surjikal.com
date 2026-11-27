@@ -2,6 +2,15 @@ import { Hono } from 'hono'
 import { Fragment } from 'hono/jsx'
 import { renderer } from './renderer'
 import { MUSIC_LINKS, SITE } from './site'
+import {
+  COLOR_SCHEMES,
+  RESOLUTION_PRESETS,
+  SATURATION_MAX,
+  SATURATION_MIN,
+  SPEED_MAX,
+  SPEED_MIN,
+  VIZ_MODES,
+} from './viz'
 
 const PUBLIC_CACHE_HEADERS = {
   'cache-control': 'public, max-age=0, s-maxage=3600',
@@ -82,45 +91,119 @@ app.get('/llms.txt', (c) => {
 
 app.use('/', renderer)
 
+function VizSelect({
+  control,
+  label,
+  options,
+}: {
+  control: string
+  label: string
+  options: readonly { readonly id: string; readonly label: string }[]
+}) {
+  return (
+    <select class="viz-select" data-viz-control={control} aria-label={label}>
+      {options.map((opt) => (
+        <option key={opt.id} value={opt.id}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  )
+}
+
+function VizSlider({
+  control,
+  label,
+  min,
+  max,
+}: {
+  control: string
+  label: string
+  min: number
+  max: number
+}) {
+  return (
+    <label class="viz-slider">
+      <span class="viz-slider-label">{label}</span>
+      <input
+        type="range"
+        class="viz-range"
+        data-viz-control={control}
+        min={min}
+        max={max}
+        step="1"
+        aria-label={label}
+      />
+      <output class="viz-slider-readout" data-viz-readout={control} />
+    </label>
+  )
+}
+
+function VizToggle() {
+  return (
+    <div class="viz-toggle" role="group" aria-label="Background visualization controls">
+      <button type="button" class="viz-btn" data-viz-dir="-1" aria-label="Previous visualization">
+        ‹
+      </button>
+      <VizSelect control="mode" label="Select visualization" options={VIZ_MODES} />
+      <button type="button" class="viz-btn" data-viz-dir="1" aria-label="Next visualization">
+        ›
+      </button>
+      <span class="viz-sep" aria-hidden="true" />
+      <VizSelect control="color" label="Select color scheme" options={COLOR_SCHEMES} />
+      <span class="viz-sep" aria-hidden="true" />
+      <VizSlider control="saturation" label="Vivid" min={SATURATION_MIN} max={SATURATION_MAX} />
+      <span class="viz-sep" aria-hidden="true" />
+      <VizSelect control="resolution" label="Select resolution" options={RESOLUTION_PRESETS} />
+      <span class="viz-sep" aria-hidden="true" />
+      <VizSlider control="speed" label="Speed" min={SPEED_MIN} max={SPEED_MAX} />
+    </div>
+  )
+}
+
 function HomePage() {
   return (
-    <main class="page">
-      <div class="hero">
-        <div class="surj-wrap">
-          <svg
-            class="surj"
-            viewBox="0 0 1000 190"
-            preserveAspectRatio="none"
-            role="img"
-            aria-label={SITE.artist}
-          >
-            <text x="0" y="165" textLength="1000" lengthAdjust="spacingAndGlyphs">
-              {SITE.artist}
-            </text>
-          </svg>
-        </div>
+    <>
+      <canvas class="bg-life" aria-hidden="true" />
+      <main class="page">
+        <div class="hero">
+          <div class="surj-wrap">
+            <svg
+              class="surj"
+              viewBox="0 0 1000 190"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label={SITE.artist}
+            >
+              <text x="0" y="165" textLength="1000" lengthAdjust="spacingAndGlyphs">
+                {SITE.artist}
+              </text>
+            </svg>
+          </div>
 
-        <nav class="music-links" aria-label="Music and video">
-          {MUSIC_LINKS.map((link, index) => (
-            <Fragment key={link.id}>
-              {index > 0 && <span class="divider" aria-hidden="true" />}
-              <a
-                class={link.id}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={link.title}
-              >
-                <span class="sr-only">{link.ariaLabel}</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d={link.svgPath} />
-                </svg>
-              </a>
-            </Fragment>
-          ))}
-        </nav>
-      </div>
-    </main>
+          <nav class="music-links" aria-label="Music and video">
+            {MUSIC_LINKS.map((link, index) => (
+              <Fragment key={link.id}>
+                {index > 0 && <span class="divider" aria-hidden="true" />}
+                <a
+                  class={link.id}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={link.title}
+                >
+                  <span class="sr-only">{link.ariaLabel}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d={link.svgPath} />
+                  </svg>
+                </a>
+              </Fragment>
+            ))}
+          </nav>
+        </div>
+      </main>
+      <VizToggle />
+    </>
   )
 }
 
