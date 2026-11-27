@@ -26,9 +26,7 @@ npm run cf-typegen
 
 ## Deployment
 
-Pushing to `main` triggers `.github/workflows/deploy.yml` to lint, typecheck, build, and deploy to Cloudflare Workers.
+Cloudflare Workers Builds is connected to this repository:
 
-Required GitHub repository secrets:
-
-- `CLOUDFLARE_API_TOKEN` (Account: Workers Scripts Edit + Zone/DNS/Workers Routes Edit)
-- `CLOUDFLARE_ACCOUNT_ID`
+- Pushing or merging to `main` builds and deploys `surj-homepage` to `surjikal.com`.
+- Opening or updating a Pull Request automatically deploys an isolated Cloudflare Workers Preview and posts the Preview URL on the PR.
