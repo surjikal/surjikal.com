@@ -1,0 +1,36 @@
+name: Update Skills
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-skills:
+    name: Update Agent Skills
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Update skills
+        run: npx --yes skills update -y
+
+      - name: Create or update pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/update-skills
+          delete-branch: true
+          commit-message: 'chore(skills): update installed skills'
+          title: 'chore(skills): update installed skills'
+          body: |
+            Automated update of installed agent skills via `npx skills update`.
