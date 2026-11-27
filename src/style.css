@@ -80,7 +80,19 @@ select {
   font: inherit;
 }
 
+.bg-life {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 50%, rgb(0 0 0 / 35%) 0%, #000 100%);
+}
+
 .page {
+  position: relative;
+  z-index: 1;
   width: 100%;
   min-height: 100dvh;
   padding: clamp(24px, 5vw, 64px) clamp(20px, 6vw, 64px);
@@ -203,4 +215,63 @@ select {
   .music-links a {
     transition: none;
   }
+}
+
+.viz-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 999px;
+  background: rgb(12 12 12 / 78%);
+  backdrop-filter: blur(8px);
+  color: rgb(255 255 255 / 72%);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.viz-btn,
+.viz-select {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.viz-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.viz-select {
+  padding: 4px 6px;
+  outline-offset: 2px;
+}
+
+.viz-btn:hover,
+.viz-select:hover {
+  color: var(--fg);
+}
+
+.viz-btn:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.viz-select option {
+  background: #111;
+  color: #fff;
 }

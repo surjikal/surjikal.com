@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { Fragment } from 'hono/jsx'
 import { renderer } from './renderer'
 import { MUSIC_LINKS, SITE } from './site'
+import { VIZ_MODES } from './viz-modes'
 
 const PUBLIC_CACHE_HEADERS = {
   'cache-control': 'public, max-age=0, s-maxage=3600',
@@ -82,45 +83,69 @@ app.get('/llms.txt', (c) => {
 
 app.use('/', renderer)
 
+function VizToggle() {
+  return (
+    <div class="viz-toggle" role="group" aria-label="Background visualization">
+      <button type="button" class="viz-btn" data-viz-dir="-1" aria-label="Previous visualization">
+        ‹
+      </button>
+      <select class="viz-select" aria-label="Select visualization">
+        {VIZ_MODES.map((mode) => (
+          <option key={mode.id} value={mode.id}>
+            {mode.label}
+          </option>
+        ))}
+      </select>
+      <button type="button" class="viz-btn" data-viz-dir="1" aria-label="Next visualization">
+        ›
+      </button>
+    </div>
+  )
+}
+
 function HomePage() {
   return (
-    <main class="page">
-      <div class="hero">
-        <div class="surj-wrap">
-          <svg
-            class="surj"
-            viewBox="0 0 1000 190"
-            preserveAspectRatio="none"
-            role="img"
-            aria-label={SITE.artist}
-          >
-            <text x="0" y="165" textLength="1000" lengthAdjust="spacingAndGlyphs">
-              {SITE.artist}
-            </text>
-          </svg>
-        </div>
+    <>
+      <canvas class="bg-life" aria-hidden="true" />
+      <main class="page">
+        <div class="hero">
+          <div class="surj-wrap">
+            <svg
+              class="surj"
+              viewBox="0 0 1000 190"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label={SITE.artist}
+            >
+              <text x="0" y="165" textLength="1000" lengthAdjust="spacingAndGlyphs">
+                {SITE.artist}
+              </text>
+            </svg>
+          </div>
 
-        <nav class="music-links" aria-label="Music and video">
-          {MUSIC_LINKS.map((link, index) => (
-            <Fragment key={link.id}>
-              {index > 0 && <span class="divider" aria-hidden="true" />}
-              <a
-                class={link.id}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={link.title}
-              >
-                <span class="sr-only">{link.ariaLabel}</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d={link.svgPath} />
-                </svg>
-              </a>
-            </Fragment>
-          ))}
-        </nav>
-      </div>
-    </main>
+          <nav class="music-links" aria-label="Music and video">
+            {MUSIC_LINKS.map((link, index) => (
+              <Fragment key={link.id}>
+                {index > 0 && <span class="divider" aria-hidden="true" />}
+                <a
+                  class={link.id}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={link.title}
+                >
+                  <span class="sr-only">{link.ariaLabel}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d={link.svgPath} />
+                  </svg>
+                </a>
+              </Fragment>
+            ))}
+          </nav>
+        </div>
+      </main>
+      <VizToggle />
+    </>
   )
 }
 
