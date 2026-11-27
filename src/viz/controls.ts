@@ -13,7 +13,7 @@ import {
   clampSpeed,
 } from './presets'
 
-const STORAGE_KEY = 'surj-viz-prefs-v3'
+const STORAGE_KEY = 'surj-viz-prefs-v4'
 
 export interface VizPrefs {
   mode: VizModeId
@@ -54,11 +54,11 @@ export function resolveInitialPrefs(): VizPrefs {
   const stored = loadStoredObject()
 
   return {
-    mode: findId(VIZ_MODES, params.get('viz') ?? readStoredString(stored, 'mode'), 'cyclic'),
+    mode: findId(VIZ_MODES, params.get('viz') ?? readStoredString(stored, 'mode'), 'boids'),
     color: findId(
       COLOR_SCHEMES,
       params.get('color') ?? readStoredString(stored, 'color'),
-      'iridescent-grey',
+      'pure-silver',
     ),
     saturation: clampSaturation(
       Number(params.get('sat') ?? readStoredString(stored, 'saturation') ?? SATURATION_DEFAULT),
@@ -66,7 +66,7 @@ export function resolveInitialPrefs(): VizPrefs {
     resolution: findId(
       RESOLUTION_PRESETS,
       params.get('res') ?? readStoredString(stored, 'resolution'),
-      'medium',
+      'coarse',
     ),
     speed: clampSpeed(
       Number(params.get('speed') ?? readStoredString(stored, 'speed') ?? SPEED_DEFAULT),

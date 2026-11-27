@@ -171,7 +171,7 @@ export const RESOLUTION_PRESETS: readonly ResolutionPreset[] = [
 
 export const SPEED_MIN = 0
 export const SPEED_MAX = 999
-export const SPEED_DEFAULT = 80
+export const SPEED_DEFAULT = 100
 
 const SPEED_CURVE_STEEPNESS = 3.5
 const SPEED_MAX_MULTIPLIER = 100
@@ -192,7 +192,7 @@ export function clampSpeed(value: number): number {
 
 export const SATURATION_MIN = 0
 export const SATURATION_MAX = 100
-export const SATURATION_DEFAULT = 18
+export const SATURATION_DEFAULT = 95
 
 export function computeVividHsl(
   scheme: ColorScheme,
