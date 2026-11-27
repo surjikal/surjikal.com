@@ -7,6 +7,7 @@
     ".wrangler",
     ".agents",
     "worker-configuration.d.ts",
-    "package-lock.json"
+    "package-lock.json",
+    "skills-lock.json"
   ]
 }
