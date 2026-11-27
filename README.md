@@ -1,7 +1,5 @@
 # surjikal.com
 
-Personal homepage for SURJ (`surjikal.com`), running on Cloudflare Workers with [Hono](https://hono.dev/) and built with [Vite](https://vite.dev/) (`@cloudflare/vite-plugin`).
-
 ## Development
 
 ```bash
