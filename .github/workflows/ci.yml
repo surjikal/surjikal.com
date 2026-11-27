@@ -128,14 +128,30 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Comment Preview URL
-        run: |
-          body=$(printf 'Preview URL: %s\nDeployment URL: %s\nCommit: `%s`' "$PREVIEW_URL" "$DEPLOYMENT_URL" "${GITHUB_SHA::7}")
-          gh pr comment "$PR_NUMBER" \
-            --edit-last \
-            --create-if-none \
-            --body "$body"
+        uses: actions/github-script@v7
         env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
           PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
           DEPLOYMENT_URL: ${{ steps.preview.outputs.deployment_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const marker = "<!-- pr-preview -->";
+            const sha = context.payload.pull_request.head.sha.slice(0, 7);
+            const body = [
+              marker,
+              `Preview URL: ${process.env.PREVIEW_URL}`,
+              `Deployment URL: ${process.env.DEPLOYMENT_URL}`,
+              `Commit: \`${sha}\``,
+            ].join("\n");
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number,
+            });
+            const existing = comments.find(
+              (c) => c.user?.login === "github-actions[bot]" && c.body?.startsWith(marker),
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ ...context.repo, issue_number, body });
+            }

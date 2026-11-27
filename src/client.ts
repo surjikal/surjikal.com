@@ -10,6 +10,20 @@ import {
 } from './viz/automata'
 import { type VizPrefs, bindControls, persistPrefs, resolveInitialPrefs } from './viz/controls'
 import {
+  createBoidsEngine,
+  createIsingEngine,
+  createKuramotoEngine,
+  createPhysarumEngine,
+} from './viz/emergent'
+import {
+  createAttractorEngine,
+  createChladniEngine,
+  createMoireEngine,
+  createQuasicrystalEngine,
+  createSandpileEngine,
+  createSingularityEngine,
+} from './viz/exotic'
+import {
   createFlowEngine,
   createGrayScottEngine,
   createRainEngine,
@@ -32,6 +46,16 @@ const ENGINE_FACTORIES: Record<VizModeId, (field: GridField) => VizEngine> = {
   dunes: createDunesEngine,
   voronoi: createVoronoiEngine,
   rain: createRainEngine,
+  physarum: createPhysarumEngine,
+  chladni: createChladniEngine,
+  quasicrystal: createQuasicrystalEngine,
+  attractor: createAttractorEngine,
+  kuramoto: createKuramotoEngine,
+  ising: createIsingEngine,
+  boids: createBoidsEngine,
+  sandpile: createSandpileEngine,
+  moire: createMoireEngine,
+  singularity: createSingularityEngine,
 }
 
 interface RuntimeState {

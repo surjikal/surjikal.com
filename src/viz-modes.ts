@@ -10,6 +10,16 @@ export interface VizMode {
     | 'dunes'
     | 'voronoi'
     | 'rain'
+    | 'physarum'
+    | 'chladni'
+    | 'quasicrystal'
+    | 'attractor'
+    | 'kuramoto'
+    | 'ising'
+    | 'boids'
+    | 'sandpile'
+    | 'moire'
+    | 'singularity'
   readonly label: string
 }
 
@@ -26,6 +36,16 @@ export const VIZ_MODES: readonly VizMode[] = [
   { id: 'dunes', label: '08 · Drift Dunes' },
   { id: 'voronoi', label: '09 · Voronoi Pulse' },
   { id: 'rain', label: '10 · Digital Rain' },
+  { id: 'physarum', label: '11 · Slime Mold' },
+  { id: 'chladni', label: '12 · Chladni Cymatics' },
+  { id: 'quasicrystal', label: '13 · Quasicrystal' },
+  { id: 'attractor', label: '14 · Strange Attractor' },
+  { id: 'kuramoto', label: '15 · Kuramoto Sync' },
+  { id: 'ising', label: '16 · Ising Criticality' },
+  { id: 'boids', label: '17 · Murmuration' },
+  { id: 'sandpile', label: '18 · Abelian Sandpile' },
+  { id: 'moire', label: '19 · Moiré Loom' },
+  { id: 'singularity', label: '20 · Binary Singularity' },
 ]
 
 export interface SpeedPreset {
