@@ -5,20 +5,20 @@ import {
   type ColorSchemeId,
   RESOLUTION_PRESETS,
   type ResolutionPresetId,
-  SATURATION_PRESETS,
-  type SaturationPresetId,
+  SATURATION_DEFAULT,
   SPEED_DEFAULT,
   VIZ_MODES,
   type VizModeId,
+  clampSaturation,
   clampSpeed,
 } from './presets'
 
-const STORAGE_KEY = 'surj-viz-prefs-v2'
+const STORAGE_KEY = 'surj-viz-prefs-v3'
 
 export interface VizPrefs {
   mode: VizModeId
   color: ColorSchemeId
-  saturation: SaturationPresetId
+  saturation: number
   resolution: ResolutionPresetId
   speed: number
 }
@@ -60,10 +60,8 @@ export function resolveInitialPrefs(): VizPrefs {
       params.get('color') ?? readStoredString(stored, 'color'),
       'iridescent-grey',
     ),
-    saturation: findId(
-      SATURATION_PRESETS,
-      params.get('sat') ?? readStoredString(stored, 'saturation'),
-      'subtle',
+    saturation: clampSaturation(
+      Number(params.get('sat') ?? readStoredString(stored, 'saturation') ?? SATURATION_DEFAULT),
     ),
     resolution: findId(
       RESOLUTION_PRESETS,
@@ -80,7 +78,7 @@ export function persistPrefs(prefs: VizPrefs): void {
   const url = new URL(window.location.href)
   url.searchParams.set('viz', prefs.mode)
   url.searchParams.set('color', prefs.color)
-  url.searchParams.set('sat', prefs.saturation)
+  url.searchParams.set('sat', String(prefs.saturation))
   url.searchParams.set('res', prefs.resolution)
   url.searchParams.set('speed', String(prefs.speed))
   window.history.replaceState(null, '', url)
@@ -112,12 +110,14 @@ function bindSelect<T extends string>(
   return el
 }
 
-function bindSpeedSlider(
+function bindSlider(
+  name: string,
   initial: number,
+  clamp: (value: number) => number,
   onChange: (value: number) => void,
 ): { sync: (value: number) => void } {
-  const slider = document.querySelector('[data-viz-control="speed"]')
-  const readout = document.querySelector('[data-viz-readout="speed"]')
+  const slider = document.querySelector(`[data-viz-control="${name}"]`)
+  const readout = document.querySelector(`[data-viz-readout="${name}"]`)
   const render = (value: number): void => {
     if (slider instanceof HTMLInputElement) slider.value = String(value)
     if (readout !== null) readout.textContent = String(value)
@@ -125,7 +125,7 @@ function bindSpeedSlider(
   render(initial)
   if (slider instanceof HTMLInputElement) {
     slider.addEventListener('input', () => {
-      const value = clampSpeed(Number(slider.value))
+      const value = clamp(Number(slider.value))
       render(value)
       onChange(value)
     })
@@ -171,14 +171,9 @@ export function bindControls(
   const color = bindSelect('[data-viz-control="color"]', COLOR_SCHEMES, prefs.color, (v) => {
     onUpdate({ color: v })
   })
-  const sat = bindSelect(
-    '[data-viz-control="saturation"]',
-    SATURATION_PRESETS,
-    prefs.saturation,
-    (v) => {
-      onUpdate({ saturation: v })
-    },
-  )
+  const sat = bindSlider('saturation', prefs.saturation, clampSaturation, (v) => {
+    onUpdate({ saturation: v })
+  })
   const res = bindSelect(
     '[data-viz-control="resolution"]',
     RESOLUTION_PRESETS,
@@ -187,7 +182,7 @@ export function bindControls(
       onUpdate({ resolution: v })
     },
   )
-  const speed = bindSpeedSlider(prefs.speed, (v) => {
+  const speed = bindSlider('speed', prefs.speed, clampSpeed, (v) => {
     onUpdate({ speed: v })
   })
   bindModeSteppers(onCycleMode, signal)
@@ -196,7 +191,7 @@ export function bindControls(
     sync: (next: VizPrefs) => {
       if (mode !== null) mode.value = next.mode
       if (color !== null) color.value = next.color
-      if (sat !== null) sat.value = next.saturation
+      sat.sync(next.saturation)
       if (res !== null) res.value = next.resolution
       speed.sync(next.speed)
     },

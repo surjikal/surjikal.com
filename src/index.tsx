@@ -5,7 +5,8 @@ import { MUSIC_LINKS, SITE } from './site'
 import {
   COLOR_SCHEMES,
   RESOLUTION_PRESETS,
-  SATURATION_PRESETS,
+  SATURATION_MAX,
+  SATURATION_MIN,
   SPEED_MAX,
   SPEED_MIN,
   VIZ_MODES,
@@ -110,6 +111,34 @@ function VizSelect({
   )
 }
 
+function VizSlider({
+  control,
+  label,
+  min,
+  max,
+}: {
+  control: string
+  label: string
+  min: number
+  max: number
+}) {
+  return (
+    <label class="viz-slider">
+      <span class="viz-slider-label">{label}</span>
+      <input
+        type="range"
+        class="viz-range"
+        data-viz-control={control}
+        min={min}
+        max={max}
+        step="1"
+        aria-label={label}
+      />
+      <output class="viz-slider-readout" data-viz-readout={control} />
+    </label>
+  )
+}
+
 function VizToggle() {
   return (
     <div class="viz-toggle" role="group" aria-label="Background visualization controls">
@@ -123,23 +152,16 @@ function VizToggle() {
       <span class="viz-sep" aria-hidden="true" />
       <VizSelect control="color" label="Select color scheme" options={COLOR_SCHEMES} />
       <span class="viz-sep" aria-hidden="true" />
-      <VizSelect control="saturation" label="Select saturation" options={SATURATION_PRESETS} />
+      <VizSlider
+        control="saturation"
+        label="Saturation"
+        min={SATURATION_MIN}
+        max={SATURATION_MAX}
+      />
       <span class="viz-sep" aria-hidden="true" />
       <VizSelect control="resolution" label="Select resolution" options={RESOLUTION_PRESETS} />
       <span class="viz-sep" aria-hidden="true" />
-      <label class="viz-speed">
-        <span class="viz-speed-label">Speed</span>
-        <input
-          type="range"
-          class="viz-range"
-          data-viz-control="speed"
-          min={SPEED_MIN}
-          max={SPEED_MAX}
-          step="1"
-          aria-label="Animation speed"
-        />
-        <output class="viz-speed-readout" data-viz-readout="speed" />
-      </label>
+      <VizSlider control="speed" label="Speed" min={SPEED_MIN} max={SPEED_MAX} />
     </div>
   )
 }

@@ -178,6 +178,7 @@ function initGlResources(canvas: HTMLCanvasElement): {
   const fbo = gl.createFramebuffer()
   if (vao === null || fieldTex === null || fbo === null) return null
   const display = createDisplayUniforms(gl)
+  allocateFieldTexture(gl, fieldTex, 1, 1)
   gl.bindVertexArray(vao)
   gl.bindFramebuffer(gl.FRAMEBUFFER, fbo)
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, fieldTex, 0)

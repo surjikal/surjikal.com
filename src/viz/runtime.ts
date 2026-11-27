@@ -21,12 +21,12 @@ import {
   type ColorScheme,
   RESOLUTION_PRESETS,
   type ResolutionPreset,
-  SATURATION_PRESETS,
   VIZ_MODES,
   type VizModeId,
+  saturationToScale,
   speedToMultiplier,
 } from './presets'
-import { type GridField, type VizEngine, createGridField, wrap } from './types'
+import { type CpuVizEngine, type GridField, type VizEngine, createGridField, wrap } from './types'
 import {
   type CompiledGpuProgram,
   type WebGLPipeline,
@@ -83,7 +83,7 @@ function lookupPrefs(prefs: VizPrefs): {
   return {
     scheme: COLOR_SCHEMES.find((c) => c.id === prefs.color) ?? fallbackScheme,
     resolution: RESOLUTION_PRESETS.find((r) => r.id === prefs.resolution) ?? fallbackRes,
-    satScale: SATURATION_PRESETS.find((s) => s.id === prefs.saturation)?.scale ?? 1,
+    satScale: saturationToScale(prefs.saturation),
     speedMultiplier: speedToMultiplier(prefs.speed),
   }
 }
@@ -115,6 +115,21 @@ function renderFrame(pipeline: WebGLPipeline, state: ActiveState, simTime: numbe
   })
 }
 
+const STEP_BUDGET_MS = 10
+
+function advanceCpuEngine(engine: CpuVizEngine, simTime: number, lastStepSim: number): number {
+  const deadline = performance.now() + STEP_BUDGET_MS
+  let cursor = lastStepSim
+  while (simTime - cursor >= engine.stepMs) {
+    cursor += engine.stepMs
+    engine.step(cursor)
+    if (performance.now() >= deadline) {
+      return simTime
+    }
+  }
+  return cursor
+}
+
 function startAnimation(
   pipeline: WebGLPipeline,
   getState: () => ActiveState,
@@ -130,9 +145,8 @@ function startAnimation(
       const state = getState()
       const dt = Math.min(100, Math.max(0, now - lastReal))
       simTime += dt * state.speedMultiplier
-      if (state.engine.kind === 'cpu' && simTime - lastStepSim >= state.engine.stepMs) {
-        state.engine.step(simTime)
-        lastStepSim = simTime
+      if (state.engine.kind === 'cpu') {
+        lastStepSim = advanceCpuEngine(state.engine, simTime, lastStepSim)
       }
       renderFrame(pipeline, state, simTime)
     }

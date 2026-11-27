@@ -153,22 +153,6 @@ export const COLOR_SCHEMES: readonly ColorScheme[] = [
   },
 ]
 
-export interface SaturationPreset {
-  readonly id: 'mono' | 'subtle' | 'medium' | 'vivid' | 'hyper'
-  readonly label: string
-  readonly scale: number
-}
-
-export type SaturationPresetId = SaturationPreset['id']
-
-export const SATURATION_PRESETS: readonly SaturationPreset[] = [
-  { id: 'mono', label: 'Sat · Mono', scale: 0 },
-  { id: 'subtle', label: 'Sat · Subtle', scale: 1 },
-  { id: 'medium', label: 'Sat · Medium', scale: 1.8 },
-  { id: 'vivid', label: 'Sat · Vivid', scale: 2.8 },
-  { id: 'hyper', label: 'Sat · Hyper', scale: 4 },
-]
-
 export interface ResolutionPreset {
   readonly id: 'coarse' | 'medium' | 'fine' | 'ultra'
   readonly label: string
@@ -186,17 +170,39 @@ export const RESOLUTION_PRESETS: readonly ResolutionPreset[] = [
 ]
 
 export const SPEED_MIN = 0
-export const SPEED_MAX = 1000
-export const SPEED_DEFAULT = 56
+export const SPEED_MAX = 999
+export const SPEED_DEFAULT = 80
 
-const SPEED_UNITS_PER_MULTIPLIER = 250 / 4.5
+const SPEED_CURVE_STEEPNESS = 3.5
+const SPEED_MAX_MULTIPLIER = 100
 
 export function speedToMultiplier(speed: number): number {
-  return speed / SPEED_UNITS_PER_MULTIPLIER
+  const normalized = speed / SPEED_MAX
+  return (
+    (SPEED_MAX_MULTIPLIER * (Math.exp(SPEED_CURVE_STEEPNESS * normalized) - 1)) /
+    (Math.exp(SPEED_CURVE_STEEPNESS) - 1)
+  )
 }
 
 export function clampSpeed(value: number): number {
   return Number.isFinite(value)
     ? Math.min(SPEED_MAX, Math.max(SPEED_MIN, Math.round(value)))
     : SPEED_DEFAULT
+}
+
+export const SATURATION_MIN = 0
+export const SATURATION_MAX = 100
+export const SATURATION_DEFAULT = 41
+
+const SATURATION_MAX_SCALE = 6
+
+export function saturationToScale(saturation: number): number {
+  const normalized = saturation / SATURATION_MAX
+  return SATURATION_MAX_SCALE * normalized * normalized
+}
+
+export function clampSaturation(value: number): number {
+  return Number.isFinite(value)
+    ? Math.min(SATURATION_MAX, Math.max(SATURATION_MIN, Math.round(value)))
+    : SATURATION_DEFAULT
 }
