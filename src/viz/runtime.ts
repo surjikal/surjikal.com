@@ -23,7 +23,6 @@ import {
   type ResolutionPreset,
   VIZ_MODES,
   type VizModeId,
-  saturationToScale,
   speedToMultiplier,
 } from './presets'
 import { type CpuVizEngine, type GridField, type VizEngine, createGridField, wrap } from './types'
@@ -65,14 +64,14 @@ interface ActiveState {
   gpuProg: CompiledGpuProgram | null
   scheme: ColorScheme
   resolution: ResolutionPreset
-  satScale: number
+  vividness: number
   speedMultiplier: number
 }
 
 function lookupPrefs(prefs: VizPrefs): {
   scheme: ColorScheme
   resolution: ResolutionPreset
-  satScale: number
+  vividness: number
   speedMultiplier: number
 } {
   const fallbackScheme = COLOR_SCHEMES[0]
@@ -83,7 +82,7 @@ function lookupPrefs(prefs: VizPrefs): {
   return {
     scheme: COLOR_SCHEMES.find((c) => c.id === prefs.color) ?? fallbackScheme,
     resolution: RESOLUTION_PRESETS.find((r) => r.id === prefs.resolution) ?? fallbackRes,
-    satScale: saturationToScale(prefs.saturation),
+    vividness: prefs.saturation,
     speedMultiplier: speedToMultiplier(prefs.speed),
   }
 }
@@ -110,7 +109,7 @@ function renderFrame(pipeline: WebGLPipeline, state: ActiveState, simTime: numbe
     rows: state.field.rows,
     resolution: state.resolution,
     scheme: state.scheme,
-    satScale: state.satScale,
+    vividness: state.vividness,
     simTime,
   })
 }

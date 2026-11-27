@@ -152,12 +152,7 @@ function VizToggle() {
       <span class="viz-sep" aria-hidden="true" />
       <VizSelect control="color" label="Select color scheme" options={COLOR_SCHEMES} />
       <span class="viz-sep" aria-hidden="true" />
-      <VizSlider
-        control="saturation"
-        label="Saturation"
-        min={SATURATION_MIN}
-        max={SATURATION_MAX}
-      />
+      <VizSlider control="saturation" label="Vivid" min={SATURATION_MIN} max={SATURATION_MAX} />
       <span class="viz-sep" aria-hidden="true" />
       <VizSelect control="resolution" label="Select resolution" options={RESOLUTION_PRESETS} />
       <span class="viz-sep" aria-hidden="true" />

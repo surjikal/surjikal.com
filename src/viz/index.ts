@@ -8,7 +8,7 @@ export {
   SATURATION_DEFAULT,
   SATURATION_MAX,
   SATURATION_MIN,
-  saturationToScale,
+  computeVividHsl,
   SPEED_DEFAULT,
   SPEED_MAX,
   SPEED_MIN,

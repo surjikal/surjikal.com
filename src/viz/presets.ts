@@ -192,13 +192,32 @@ export function clampSpeed(value: number): number {
 
 export const SATURATION_MIN = 0
 export const SATURATION_MAX = 100
-export const SATURATION_DEFAULT = 41
+export const SATURATION_DEFAULT = 18
 
-const SATURATION_MAX_SCALE = 6
+export function computeVividHsl(
+  scheme: ColorScheme,
+  vividness: number,
+): { saturation: number; lightness: number; alpha: number } {
+  const baseSat = scheme.saturation / 100
+  const baseLight = scheme.lightness / 100
+  const baseAlpha = scheme.alpha
 
-export function saturationToScale(saturation: number): number {
-  const normalized = saturation / SATURATION_MAX
-  return SATURATION_MAX_SCALE * normalized * normalized
+  if (vividness <= 30) {
+    const t = Math.max(0, vividness) / 30
+    return {
+      saturation: Math.min(0.95, baseSat * 6 * t * t),
+      lightness: baseLight,
+      alpha: baseAlpha,
+    }
+  }
+
+  const u = Math.min(1, (vividness - 30) / 70)
+  const satAt30 = Math.min(0.95, baseSat * 6)
+  const saturation = baseSat === 0 ? 0 : satAt30 + (1 - satAt30) * Math.pow(u, 0.7)
+  const targetLight = baseSat === 0 ? 0.96 : 0.56
+  const lightness = baseLight + (targetLight - baseLight) * (u * 0.85)
+  const alpha = baseAlpha + (0.85 - baseAlpha) * Math.pow(u, 0.85)
+  return { saturation, lightness, alpha }
 }
 
 export function clampSaturation(value: number): number {

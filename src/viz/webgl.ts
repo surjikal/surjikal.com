@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-import { type ColorScheme, type ResolutionPreset } from './presets'
+import { type ColorScheme, type ResolutionPreset, computeVividHsl } from './presets'
 import { DISPLAY_FRAGMENT_SHADER, FULLSCREEN_VERTEX_SHADER } from './shaders'
 import { type GridField, packFieldToRgBytes } from './types'
 
@@ -69,7 +69,7 @@ export interface RenderParams {
   rows: number
   resolution: ResolutionPreset
   scheme: ColorScheme
-  satScale: number
+  vividness: number
   simTime: number
 }
 
@@ -137,8 +137,8 @@ function drawDisplayPass(
   gl.uniform1f(u.uCellSize, p.resolution.cellSize)
   gl.uniform1f(u.uDotSize, p.resolution.dotSize)
   gl.uniform1f(u.uTimePhase, (p.simTime * 0.000018) % 1)
-  const sat = Math.min(0.95, Math.max(0, (p.scheme.saturation * p.satScale) / 100))
-  gl.uniform4f(u.uHslBase, sat, p.scheme.lightness / 100, p.scheme.alpha, 0)
+  const hsl = computeVividHsl(p.scheme, p.vividness)
+  gl.uniform4f(u.uHslBase, hsl.saturation, hsl.lightness, hsl.alpha, 0)
   gl.uniform2f(u.uHueRange, p.scheme.hueStart, p.scheme.hueSpan)
   gl.drawArrays(gl.TRIANGLES, 0, 3)
 }
