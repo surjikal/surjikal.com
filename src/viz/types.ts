@@ -1,73 +1,111 @@
-export const CELL_SIZE = 16
-
 export interface GridField {
-  cols: number
-  rows: number
-  intensity: Float32Array
-  phase: Float32Array
+  readonly cols: number
+  readonly rows: number
+  readonly total: number
+  readonly cellSize: number
+  readonly left: Int32Array
+  readonly right: Int32Array
+  readonly up: Int32Array
+  readonly down: Int32Array
+  readonly intensity: Float32Array
+  readonly phase: Float32Array
+  readonly rgBytes: Uint8Array
+  dirty: boolean
 }
 
-export interface VizEngine {
+export interface CpuVizEngine {
+  readonly kind: 'cpu'
   readonly stepMs: number
-  step(now: number): void
-  update(now: number): void
+  readonly step: (simTime: number) => void
+  readonly update: (simTime: number) => void
 }
 
-export function createGridField(width: number, height: number): GridField {
-  const cols = Math.max(8, Math.ceil(width / CELL_SIZE))
-  const rows = Math.max(8, Math.ceil(height / CELL_SIZE))
-  const total = cols * rows
-  return {
-    cols,
-    rows,
-    intensity: new Float32Array(total),
-    phase: new Float32Array(total),
-  }
+export interface GpuVizEngine {
+  readonly kind: 'gpu'
+  readonly fragmentSource: string
+  readonly updateUniforms?: (
+    gl: WebGL2RenderingContext,
+    program: WebGLProgram,
+    simTime: number,
+  ) => void
 }
+
+export type VizEngine = CpuVizEngine | GpuVizEngine
 
 export function wrap(value: number, limit: number): number {
   const mod = value % limit
   return mod < 0 ? mod + limit : mod
 }
 
-export function countMatchingNeighbors(
-  cells: Uint8Array,
-  cols: number,
-  rows: number,
-  x: number,
-  y: number,
-  target: number,
-): number {
-  let sum = 0
-  for (let dy = -1; dy <= 1; dy += 1) {
-    const ny = wrap(y + dy, rows) * cols
-    for (let dx = -1; dx <= 1; dx += 1) {
-      if ((dx !== 0 || dy !== 0) && (cells[ny + wrap(x + dx, cols)] ?? 0) === target) {
-        sum += 1
-      }
-    }
+export function createGridField(width: number, height: number, cellSize: number): GridField {
+  const cols = Math.max(8, Math.ceil(width / cellSize))
+  const rows = Math.max(8, Math.ceil(height / cellSize))
+  const total = cols * rows
+  const left = new Int32Array(cols)
+  const right = new Int32Array(cols)
+  const up = new Int32Array(rows)
+  const down = new Int32Array(rows)
+
+  for (let x = 0; x < cols; x += 1) {
+    left[x] = wrap(x - 1, cols)
+    right[x] = wrap(x + 1, cols)
   }
-  return sum
+  for (let y = 0; y < rows; y += 1) {
+    up[y] = wrap(y - 1, rows) * cols
+    down[y] = wrap(y + 1, rows) * cols
+  }
+
+  return {
+    cols,
+    rows,
+    total,
+    cellSize,
+    left,
+    right,
+    up,
+    down,
+    intensity: new Float32Array(total),
+    phase: new Float32Array(total),
+    rgBytes: new Uint8Array(total * 2),
+    dirty: true,
+  }
+}
+
+export function packFieldToRgBytes(field: GridField): Uint8Array {
+  const { total, intensity, phase, rgBytes } = field
+  for (let i = 0; i < total; i += 1) {
+    const clampedV = Math.min(1, Math.max(0, intensity[i] ?? 0))
+    const p = phase[i] ?? 0
+    const wrappedP = p - Math.floor(p)
+    const offset = i * 2
+    rgBytes[offset] = Math.trunc(clampedV * 255 + 0.5)
+    rgBytes[offset + 1] = Math.trunc(wrappedP * 255 + 0.5)
+  }
+  return rgBytes
 }
 
 export function smoothToward(
   targetArr: Float32Array,
-  currentArr: Float32Array,
+  field: GridField,
   upRate: number,
   downRate: number,
 ): void {
+  const currentArr = field.intensity
   for (let i = 0; i < currentArr.length; i += 1) {
     const target = targetArr[i] ?? 0
     const current = currentArr[i] ?? 0
     const rate = target > current ? upRate : downRate
     currentArr[i] = current + (target - current) * rate
   }
+  field.dirty = true
 }
 
-export function seedRandomCells(cells: Uint8Array, density: number): void {
-  for (let i = 0; i < cells.length; i += 1) {
-    if (Math.random() < density) {
-      cells[i] = 1
-    }
+export function createFastRng(seed = 0x9e3779b9): () => number {
+  let state = Math.trunc(seed) || 1
+  return () => {
+    state ^= state << 13
+    state ^= state >>> 17
+    state ^= state << 5
+    return (state >>> 0) / 4294967296
   }
 }

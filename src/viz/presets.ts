@@ -2,23 +2,18 @@ export interface VizMode {
   readonly id:
     | 'cyclic'
     | 'brians-brain'
-    | 'life'
     | 'gray-scott'
     | 'waves'
     | 'flow'
-    | 'lenia'
-    | 'dunes'
     | 'voronoi'
     | 'rain'
     | 'physarum'
     | 'chladni'
-    | 'quasicrystal'
     | 'attractor'
     | 'kuramoto'
     | 'ising'
     | 'boids'
     | 'sandpile'
-    | 'moire'
     | 'singularity'
   readonly label: string
 }
@@ -28,39 +23,19 @@ export type VizModeId = VizMode['id']
 export const VIZ_MODES: readonly VizMode[] = [
   { id: 'cyclic', label: '01 · Cyclic CA' },
   { id: 'brians-brain', label: "02 · Brian's Brain" },
-  { id: 'life', label: '03 · Game of Life' },
-  { id: 'gray-scott', label: '04 · Gray-Scott' },
-  { id: 'waves', label: '05 · Wave Interference' },
-  { id: 'flow', label: '06 · Value Flow' },
-  { id: 'lenia', label: '07 · Smooth Life' },
-  { id: 'dunes', label: '08 · Drift Dunes' },
-  { id: 'voronoi', label: '09 · Voronoi Pulse' },
-  { id: 'rain', label: '10 · Digital Rain' },
-  { id: 'physarum', label: '11 · Slime Mold' },
-  { id: 'chladni', label: '12 · Chladni Cymatics' },
-  { id: 'quasicrystal', label: '13 · Quasicrystal' },
-  { id: 'attractor', label: '14 · Strange Attractor' },
-  { id: 'kuramoto', label: '15 · Kuramoto Sync' },
-  { id: 'ising', label: '16 · Ising Criticality' },
-  { id: 'boids', label: '17 · Murmuration' },
-  { id: 'sandpile', label: '18 · Abelian Sandpile' },
-  { id: 'moire', label: '19 · Moiré Loom' },
-  { id: 'singularity', label: '20 · Binary Singularity' },
-]
-
-export interface SpeedPreset {
-  readonly id: 'slow' | 'normal' | 'fast' | 'very-fast'
-  readonly label: string
-  readonly multiplier: number
-}
-
-export type SpeedPresetId = SpeedPreset['id']
-
-export const SPEED_PRESETS: readonly SpeedPreset[] = [
-  { id: 'slow', label: 'Slow', multiplier: 0.4 },
-  { id: 'normal', label: 'Normal', multiplier: 1 },
-  { id: 'fast', label: 'Fast', multiplier: 2.2 },
-  { id: 'very-fast', label: 'Very Fast', multiplier: 4.5 },
+  { id: 'gray-scott', label: '03 · Gray-Scott' },
+  { id: 'waves', label: '04 · Wave Interference' },
+  { id: 'flow', label: '05 · Value Flow' },
+  { id: 'voronoi', label: '06 · Voronoi Pulse' },
+  { id: 'rain', label: '07 · Digital Rain' },
+  { id: 'physarum', label: '08 · Slime Mold' },
+  { id: 'chladni', label: '09 · Chladni Cymatics' },
+  { id: 'attractor', label: '10 · Strange Attractor' },
+  { id: 'kuramoto', label: '11 · Kuramoto Sync' },
+  { id: 'ising', label: '12 · Ising Criticality' },
+  { id: 'boids', label: '13 · Murmuration' },
+  { id: 'sandpile', label: '14 · Abelian Sandpile' },
+  { id: 'singularity', label: '15 · Binary Singularity' },
 ]
 
 export interface ColorScheme {
@@ -176,4 +151,51 @@ export const COLOR_SCHEMES: readonly ColorScheme[] = [
     lightness: 76,
     alpha: 0.22,
   },
+]
+
+export interface SaturationPreset {
+  readonly id: 'mono' | 'subtle' | 'medium' | 'vivid' | 'hyper'
+  readonly label: string
+  readonly scale: number
+}
+
+export type SaturationPresetId = SaturationPreset['id']
+
+export const SATURATION_PRESETS: readonly SaturationPreset[] = [
+  { id: 'mono', label: 'Sat · Mono', scale: 0 },
+  { id: 'subtle', label: 'Sat · Subtle', scale: 1 },
+  { id: 'medium', label: 'Sat · Medium', scale: 1.8 },
+  { id: 'vivid', label: 'Sat · Vivid', scale: 2.8 },
+  { id: 'hyper', label: 'Sat · Hyper', scale: 4 },
+]
+
+export interface ResolutionPreset {
+  readonly id: 'coarse' | 'medium' | 'fine' | 'ultra'
+  readonly label: string
+  readonly cellSize: number
+  readonly dotSize: number
+}
+
+export type ResolutionPresetId = ResolutionPreset['id']
+
+export const RESOLUTION_PRESETS: readonly ResolutionPreset[] = [
+  { id: 'coarse', label: 'Res · Coarse', cellSize: 24, dotSize: 3 },
+  { id: 'medium', label: 'Res · Med', cellSize: 16, dotSize: 2 },
+  { id: 'fine', label: 'Res · Fine', cellSize: 10, dotSize: 1.5 },
+  { id: 'ultra', label: 'Res · Ultra', cellSize: 6, dotSize: 1 },
+]
+
+export interface SpeedPreset {
+  readonly id: 'slow' | 'normal' | 'fast' | 'very-fast'
+  readonly label: string
+  readonly multiplier: number
+}
+
+export type SpeedPresetId = SpeedPreset['id']
+
+export const SPEED_PRESETS: readonly SpeedPreset[] = [
+  { id: 'slow', label: 'Speed · Slow', multiplier: 0.4 },
+  { id: 'normal', label: 'Speed · Normal', multiplier: 1 },
+  { id: 'fast', label: 'Speed · Fast', multiplier: 2.2 },
+  { id: 'very-fast', label: 'Speed · Max', multiplier: 4.5 },
 ]

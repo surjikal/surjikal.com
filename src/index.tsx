@@ -2,7 +2,13 @@ import { Hono } from 'hono'
 import { Fragment } from 'hono/jsx'
 import { renderer } from './renderer'
 import { MUSIC_LINKS, SITE } from './site'
-import { COLOR_SCHEMES, SPEED_PRESETS, VIZ_MODES } from './viz-modes'
+import {
+  COLOR_SCHEMES,
+  RESOLUTION_PRESETS,
+  SATURATION_PRESETS,
+  SPEED_PRESETS,
+  VIZ_MODES,
+} from './viz'
 
 const PUBLIC_CACHE_HEADERS = {
   'cache-control': 'public, max-age=0, s-maxage=3600',
@@ -83,38 +89,44 @@ app.get('/llms.txt', (c) => {
 
 app.use('/', renderer)
 
+function VizSelect({
+  control,
+  label,
+  options,
+}: {
+  control: string
+  label: string
+  options: readonly { readonly id: string; readonly label: string }[]
+}) {
+  return (
+    <select class="viz-select" data-viz-control={control} aria-label={label}>
+      {options.map((opt) => (
+        <option key={opt.id} value={opt.id}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  )
+}
+
 function VizToggle() {
   return (
     <div class="viz-toggle" role="group" aria-label="Background visualization controls">
       <button type="button" class="viz-btn" data-viz-dir="-1" aria-label="Previous visualization">
         ‹
       </button>
-      <select class="viz-select" data-viz-control="mode" aria-label="Select visualization">
-        {VIZ_MODES.map((mode) => (
-          <option key={mode.id} value={mode.id}>
-            {mode.label}
-          </option>
-        ))}
-      </select>
+      <VizSelect control="mode" label="Select visualization" options={VIZ_MODES} />
       <button type="button" class="viz-btn" data-viz-dir="1" aria-label="Next visualization">
         ›
       </button>
       <span class="viz-sep" aria-hidden="true" />
-      <select class="viz-select" data-viz-control="color" aria-label="Select color scheme">
-        {COLOR_SCHEMES.map((scheme) => (
-          <option key={scheme.id} value={scheme.id}>
-            {scheme.label}
-          </option>
-        ))}
-      </select>
+      <VizSelect control="color" label="Select color scheme" options={COLOR_SCHEMES} />
       <span class="viz-sep" aria-hidden="true" />
-      <select class="viz-select" data-viz-control="speed" aria-label="Select speed">
-        {SPEED_PRESETS.map((preset) => (
-          <option key={preset.id} value={preset.id}>
-            {preset.label}
-          </option>
-        ))}
-      </select>
+      <VizSelect control="saturation" label="Select saturation" options={SATURATION_PRESETS} />
+      <span class="viz-sep" aria-hidden="true" />
+      <VizSelect control="resolution" label="Select resolution" options={RESOLUTION_PRESETS} />
+      <span class="viz-sep" aria-hidden="true" />
+      <VizSelect control="speed" label="Select speed" options={SPEED_PRESETS} />
     </div>
   )
 }
