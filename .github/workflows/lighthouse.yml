@@ -1,0 +1,158 @@
+name: Lighthouse
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+concurrency:
+  group: lighthouse-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lighthouse:
+    name: Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Lighthouse
+        run: npx lhci autorun
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports-${{ github.run_id }}
+          path: .lighthouseci/
+          retention-days: 90
+          include-hidden-files: true
+
+      - name: Summarize scores
+        run: |
+          jq -s -c --arg commit "$GITHUB_SHA" --arg date "$(date -u +%FT%TZ)" '
+            def mean(category): (map(.categories[category].score) | add / length * 100 | round);
+            {
+              commit: $commit,
+              date: $date,
+              runs: length,
+              performance: mean("performance"),
+              accessibility: mean("accessibility"),
+              "best-practices": mean("best-practices"),
+              seo: mean("seo")
+            }
+          ' .lighthouseci/lhr-*.json > score.json
+          jq -r 'to_entries | map("| \(.key) | \(.value) |") | .[]' score.json \
+            | { echo "| metric | value |"; echo "| --- | --- |"; cat; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish baseline score
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-score
+          path: score.json
+          retention-days: 90
+
+      - name: Download baseline score from main
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          workflow_id=$(gh api --paginate "repos/$GH_REPO/actions/workflows" \
+            --jq '.workflows[] | select(.path == ".github/workflows/lighthouse.yml") | .id')
+          if [ -z "$workflow_id" ]; then
+            echo "No main baseline workflow exists yet."
+            exit 0
+          fi
+          baseline_run_id=$(gh run list --workflow "$workflow_id" --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -z "$baseline_run_id" ]; then
+            echo "No successful main baseline run exists yet."
+            exit 0
+          fi
+          artifact_id=$(gh api --paginate "repos/$GH_REPO/actions/runs/$baseline_run_id/artifacts" \
+            --jq '.artifacts[] | select(.name == "lighthouse-score" and .expired == false) | .id')
+          if [ -z "$artifact_id" ]; then
+            echo "The latest main baseline artifact is unavailable or expired."
+            exit 0
+          fi
+          gh run download "$baseline_run_id" --name lighthouse-score --dir baseline
+
+      - name: Comment scores on PR
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("node:fs");
+            const marker = "<!-- lighthouse-report -->";
+            const categories = {
+              performance: "Performance",
+              accessibility: "Accessibility",
+              "best-practices": "Best practices",
+              seo: "SEO",
+            };
+            const current = JSON.parse(fs.readFileSync("score.json", "utf8"));
+            const baseline = fs.existsSync("baseline/score.json")
+              ? JSON.parse(fs.readFileSync("baseline/score.json", "utf8"))
+              : undefined;
+
+            const gradeIcon = (score) => (score >= 90 ? "🟢" : score >= 50 ? "🟠" : "🔴");
+            const formatDelta = (category) => {
+              if (!baseline) return "";
+              const delta = current[category] - baseline[category];
+              if (delta === 0) return "·";
+              return delta > 0 ? `▲ +${delta}` : `▼ ${delta}`;
+            };
+
+            const rows = Object.entries(categories).map(
+              ([category, label]) =>
+                `| ${gradeIcon(current[category])} | ${label} | **${current[category]}** | ${baseline ? baseline[category] : "–"} | ${formatDelta(category)} |`,
+            );
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              marker,
+              "### Lighthouse",
+              "",
+              "| | Category | PR | `main` | Change |",
+              "| :-: | :-- | --: | --: | :-- |",
+              ...rows,
+              "",
+              `<sub>Average of ${current.runs} runs on \`/\` · ${baseline ? `vs \`${baseline.commit.slice(0, 7)}\`` : "no `main` baseline yet"} · [reports](${runUrl})</sub>`,
+            ].join("\n");
+
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number,
+            });
+            const existing = comments.find(
+              (comment) => comment.user?.login === "github-actions[bot]" && comment.body?.startsWith(marker),
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ ...context.repo, issue_number, body });
+            }
