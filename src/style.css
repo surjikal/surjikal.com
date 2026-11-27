@@ -283,3 +283,22 @@ select {
   background: #111;
   color: #fff;
 }
+
+.viz-speed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+}
+
+.viz-range {
+  width: 96px;
+  accent-color: currentcolor;
+  cursor: pointer;
+}
+
+.viz-speed-readout {
+  min-width: 3ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

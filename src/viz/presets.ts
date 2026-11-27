@@ -185,17 +185,18 @@ export const RESOLUTION_PRESETS: readonly ResolutionPreset[] = [
   { id: 'ultra', label: 'Res · Ultra', cellSize: 6, dotSize: 1 },
 ]
 
-export interface SpeedPreset {
-  readonly id: 'slow' | 'normal' | 'fast' | 'very-fast'
-  readonly label: string
-  readonly multiplier: number
+export const SPEED_MIN = 0
+export const SPEED_MAX = 1000
+export const SPEED_DEFAULT = 56
+
+const SPEED_UNITS_PER_MULTIPLIER = 250 / 4.5
+
+export function speedToMultiplier(speed: number): number {
+  return speed / SPEED_UNITS_PER_MULTIPLIER
 }
 
-export type SpeedPresetId = SpeedPreset['id']
-
-export const SPEED_PRESETS: readonly SpeedPreset[] = [
-  { id: 'slow', label: 'Speed · Slow', multiplier: 0.4 },
-  { id: 'normal', label: 'Speed · Normal', multiplier: 1 },
-  { id: 'fast', label: 'Speed · Fast', multiplier: 2.2 },
-  { id: 'very-fast', label: 'Speed · Max', multiplier: 4.5 },
-]
+export function clampSpeed(value: number): number {
+  return Number.isFinite(value)
+    ? Math.min(SPEED_MAX, Math.max(SPEED_MIN, Math.round(value)))
+    : SPEED_DEFAULT
+}

@@ -7,10 +7,10 @@ import {
   type ResolutionPresetId,
   SATURATION_PRESETS,
   type SaturationPresetId,
-  SPEED_PRESETS,
-  type SpeedPresetId,
+  SPEED_DEFAULT,
   VIZ_MODES,
   type VizModeId,
+  clampSpeed,
 } from './presets'
 
 const STORAGE_KEY = 'surj-viz-prefs-v2'
@@ -20,7 +20,7 @@ export interface VizPrefs {
   color: ColorSchemeId
   saturation: SaturationPresetId
   resolution: ResolutionPresetId
-  speed: SpeedPresetId
+  speed: number
 }
 
 function findId<T extends string>(
@@ -70,10 +70,8 @@ export function resolveInitialPrefs(): VizPrefs {
       params.get('res') ?? readStoredString(stored, 'resolution'),
       'medium',
     ),
-    speed: findId(
-      SPEED_PRESETS,
-      params.get('speed') ?? readStoredString(stored, 'speed'),
-      'normal',
+    speed: clampSpeed(
+      Number(params.get('speed') ?? readStoredString(stored, 'speed') ?? SPEED_DEFAULT),
     ),
   }
 }
@@ -84,7 +82,7 @@ export function persistPrefs(prefs: VizPrefs): void {
   url.searchParams.set('color', prefs.color)
   url.searchParams.set('sat', prefs.saturation)
   url.searchParams.set('res', prefs.resolution)
-  url.searchParams.set('speed', prefs.speed)
+  url.searchParams.set('speed', String(prefs.speed))
   window.history.replaceState(null, '', url)
 
   try {
@@ -112,6 +110,27 @@ function bindSelect<T extends string>(
     }
   })
   return el
+}
+
+function bindSpeedSlider(
+  initial: number,
+  onChange: (value: number) => void,
+): { sync: (value: number) => void } {
+  const slider = document.querySelector('[data-viz-control="speed"]')
+  const readout = document.querySelector('[data-viz-readout="speed"]')
+  const render = (value: number): void => {
+    if (slider instanceof HTMLInputElement) slider.value = String(value)
+    if (readout !== null) readout.textContent = String(value)
+  }
+  render(initial)
+  if (slider instanceof HTMLInputElement) {
+    slider.addEventListener('input', () => {
+      const value = clampSpeed(Number(slider.value))
+      render(value)
+      onChange(value)
+    })
+  }
+  return { sync: render }
 }
 
 function bindModeSteppers(onCycleMode: (delta: number) => void, signal: AbortSignal): void {
@@ -168,7 +187,7 @@ export function bindControls(
       onUpdate({ resolution: v })
     },
   )
-  const speed = bindSelect('[data-viz-control="speed"]', SPEED_PRESETS, prefs.speed, (v) => {
+  const speed = bindSpeedSlider(prefs.speed, (v) => {
     onUpdate({ speed: v })
   })
   bindModeSteppers(onCycleMode, signal)
@@ -179,7 +198,7 @@ export function bindControls(
       if (color !== null) color.value = next.color
       if (sat !== null) sat.value = next.saturation
       if (res !== null) res.value = next.resolution
-      if (speed !== null) speed.value = next.speed
+      speed.sync(next.speed)
     },
   }
 }

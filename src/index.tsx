@@ -6,7 +6,8 @@ import {
   COLOR_SCHEMES,
   RESOLUTION_PRESETS,
   SATURATION_PRESETS,
-  SPEED_PRESETS,
+  SPEED_MAX,
+  SPEED_MIN,
   VIZ_MODES,
 } from './viz'
 
@@ -126,7 +127,19 @@ function VizToggle() {
       <span class="viz-sep" aria-hidden="true" />
       <VizSelect control="resolution" label="Select resolution" options={RESOLUTION_PRESETS} />
       <span class="viz-sep" aria-hidden="true" />
-      <VizSelect control="speed" label="Select speed" options={SPEED_PRESETS} />
+      <label class="viz-speed">
+        <span class="viz-speed-label">Speed</span>
+        <input
+          type="range"
+          class="viz-range"
+          data-viz-control="speed"
+          min={SPEED_MIN}
+          max={SPEED_MAX}
+          step="1"
+          aria-label="Animation speed"
+        />
+        <output class="viz-speed-readout" data-viz-readout="speed" />
+      </label>
     </div>
   )
 }

@@ -22,9 +22,9 @@ import {
   RESOLUTION_PRESETS,
   type ResolutionPreset,
   SATURATION_PRESETS,
-  SPEED_PRESETS,
   VIZ_MODES,
   type VizModeId,
+  speedToMultiplier,
 } from './presets'
 import { type GridField, type VizEngine, createGridField, wrap } from './types'
 import {
@@ -84,7 +84,7 @@ function lookupPrefs(prefs: VizPrefs): {
     scheme: COLOR_SCHEMES.find((c) => c.id === prefs.color) ?? fallbackScheme,
     resolution: RESOLUTION_PRESETS.find((r) => r.id === prefs.resolution) ?? fallbackRes,
     satScale: SATURATION_PRESETS.find((s) => s.id === prefs.saturation)?.scale ?? 1,
-    speedMultiplier: SPEED_PRESETS.find((s) => s.id === prefs.speed)?.multiplier ?? 1,
+    speedMultiplier: speedToMultiplier(prefs.speed),
   }
 }
 
